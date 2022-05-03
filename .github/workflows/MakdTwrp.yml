@@ -1,4 +1,4 @@
-name: Normal
+name: Make Twrp
 
 on:
   workflow_dispatch:
