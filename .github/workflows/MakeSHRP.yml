@@ -35,7 +35,7 @@ on:
 jobs:
   build:
     if: github.event.repository.owner.id == github.event.sender.id
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     
     steps:
     - name: Check Out
@@ -97,14 +97,17 @@ jobs:
         source build/envsetup.sh
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng 
         make clean
-        make recoveryimage -j$(nproc --all)        
+        make recoveryimage -j$(nproc --all)
+        ls -al -h out/target/product/${{ github.event.inputs.DEVICE_NAME }}
       
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery.img
-        name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.run_id }}
-        tag_name: ${{ github.run_id }}
-        body: Recovery for ${{ github.event.inputs.DEVICE_NAME }}
+        files: |
+          workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/**.img
+          workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/**.zip
+        name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.event.inputs.MANIFEST_BRANCH }}
+        tag_name: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}-${{ github.run_id }}
+        body: SHRP Recovery for ${{ github.event.inputs.MANIFEST_BRANCH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
